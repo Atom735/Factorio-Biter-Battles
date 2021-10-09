@@ -65,15 +65,21 @@ function Public.initial_setup()
 		["only_admins_vote"] = false,		--Are only admins able to vote on the global difficulty?
 	}
 
+
+	global.bb_teams_type = Tables.game_teams_types[1]
+	global.bb_map_params = {
+		border_river_width    = 44,
+		spawn_circle_size     = 39,
+		reflect_rotate        = false,
+		mixed_ores            = true,
+		mixed_ores_multiplier = {1, 1, 1, 1},
+	}
+
 	--Disable Nauvis
-	local surface = game.surfaces[1]
-	local map_gen_settings = surface.map_gen_settings
-	map_gen_settings.height = 3
-	map_gen_settings.width = 3
-	surface.map_gen_settings = map_gen_settings
-	for chunk in surface.get_chunks() do
-		surface.delete_chunk({chunk.x, chunk.y})
-	end
+	local surface = game.surfaces.nauvis
+	surface.map_gen_settings.height = 3
+	surface.map_gen_settings.width = 3
+	surface.clear()
 end
 
 --Terrain Playground Surface
@@ -120,10 +126,12 @@ function Public.tables()
 	-- Name of main BB surface within game.surfaces
 	-- We hot-swap here between 2 surfaces.
 	if global.bb_surface_name == 'bb0' then
-		global.bb_surface_name = "bb1"
+		global.bb_surface_name = 'bb1'
 	else
-		global.bb_surface_name = "bb0"
+		global.bb_surface_name = 'bb0'
 	end
+
+
 
 	global.active_biters = {}
 	global.bb_evolution = {}

@@ -4,7 +4,6 @@ local Server = require 'utils.server'
 
 local tables = require "maps.biter_battles_v2.tables"
 local food_values = tables.food_values
-local force_translation = tables.force_translation
 local enemy_team_of = tables.enemy_team_of
 
 local minimum_modifier = 125

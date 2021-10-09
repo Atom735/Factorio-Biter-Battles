@@ -1,14 +1,19 @@
 local Public = {}
 
+--[[ !!! Don't sorting this, scenario uses indexes !!! ]]
 Public.game_teams_types = {
     'NS' , --[[ forces_names[[0--(3+0)] + 2 +  0] ]]
     'EW' , --[[ forces_names[[0--(3+0)] + 2 +  4] ]]
     'NE' , --[[ forces_names[[0--(3+0)] + 2 +  8] ]]
     'NW' , --[[ forces_names[[0--(3+0)] + 2 + 12] ]]
     'NS4', --[[ forces_names[[0--(3+4)] + 2 +  0] ]]
+    'EW4', -- duplicate
     'NE4', --[[ forces_names[[0--(3+4)] + 2 +  8] ]]
+    'NW4', -- duplicate
 }
 
+
+--[[ !!! Don't sorting this, scenario uses indexes !!! ]]
 Public.forces_names = {
 	'spectator' ,
 	--[[ NS  game [ 2- 5] ]]
@@ -27,6 +32,7 @@ Public.forces_names = {
 	'southeast' , 'southeast_biters',
 }
 
+--[[ !!! Don't sorting this, scenario uses indexes !!! ]]
 Public.forces_spawns = {
 	--[[north]]     {  0,-44},
 	--[[south]]     {  0, 44},
@@ -89,10 +95,6 @@ for k, v in pairs(Public.food_values) do
 end
 Public.gui_foods["raw-fish"] = "Send a fish to spy for 45 seconds.\nLeft Mouse Button: Send one fish.\nRMB: Sends 5 fish.\nShift+LMB: Send all fish.\nShift+RMB: Send half of all fish."
 
-Public.force_translation = {
-	["south_biters"] = "south",
-	["north_biters"] = "north"
-}
 
 Public.enemy_team_of = {
 	["north"] = "south",

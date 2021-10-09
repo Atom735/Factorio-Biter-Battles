@@ -1,0 +1,20 @@
+{
+  "editor.tabSize": 4,
+  "editor.useTabStops": true,
+  "editor.insertSpaces": true,
+  "editor.comments.insertSpace": true,
+  "diffEditor.ignoreTrimWhitespace": true,
+  "editor.trimAutoWhitespace": true,
+  "Lua.diagnostics.globals": [
+    "global",
+    "game",
+    "defines",
+    "commands",
+    "log",
+    "script",
+    "serpent"
+  ],
+  "Lua.hint.enable": true,
+  "Lua.hint.setType": true,
+  "files.trimTrailingWhitespace": true
+}

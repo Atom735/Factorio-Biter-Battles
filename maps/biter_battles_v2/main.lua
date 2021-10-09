@@ -89,7 +89,7 @@ local function on_tick()
 
 	Ai.reanimate_units()
 
-	if tick % 60 == 0 then 
+	if tick % 60 == 0 then
 		global.bb_threat["north_biters"] = global.bb_threat["north_biters"] + global.bb_threat_income["north_biters"]
 		global.bb_threat["south_biters"] = global.bb_threat["south_biters"] + global.bb_threat_income["south_biters"]
 	end
@@ -109,7 +109,7 @@ local function on_tick()
 		end
 	end
 
-	if tick % 30 == 0 then	
+	if tick % 30 == 0 then
 		local key = tick % 3600
 		if tick_minute_functions[key] then tick_minute_functions[key]() end
 	end
@@ -137,33 +137,66 @@ end
 local function on_chunk_generated(event)
 	local surface = event.surface
 
-	-- Check if we're out of init.
+	--[[
+        @En Check if we're out of init.
+
+        @Ru Проверьте, вышли ли мы из инициализации.
+    --]]
 	if not surface or not surface.valid then return end
 
-	-- Necessary check to ignore nauvis surface.
+	--[[
+        @En Necessary check to ignore nauvis surface.
+
+        @Ru Необходимая проверка, чтобы игнорировать поверхность nauvis.
+    --]]
 	if surface.name ~= global.bb_surface_name then return end
 
-	-- Generate structures for north only.
+	--[[
+        @En Generate structures for one team only.
+
+        @Ru Создавайте структуры только для одной команды.
+    --]]
+
 	local pos = event.area.left_top
 	if pos.y < 0 then
 		Terrain.generate(event)
 	end
+	--[[
+        @En
+        Request chunk for opposite side, maintain the lockstep.
+        NOTE: There is still a window where user can place down a structure
+        and it will be mirrored. However this window is so tiny - user would
+        need to fly in god mode and spam entities in partially generated
+        chunks.
 
-	-- Request chunk for opposite side, maintain the lockstep.
-	-- NOTE: There is still a window where user can place down a structure
-	-- and it will be mirrored. However this window is so tiny - user would
-	-- need to fly in god mode and spam entities in partially generated
-	-- chunks.
+        @Ru
+        Запросите блок для противоположной стороны, сохраните синхронизацию.
+        ПРИМЕЧАНИЕ. По-прежнему существует окно, в котором пользователь может
+        разместить структуру, и она будет отражена. Однако это окно настолько
+        маленькое - пользователю нужно будет летать в режиме бога и спамить
+        объекты частично сгенерированными блоками.
+    --]]
 	local req_pos = { pos.x + 16, -pos.y + 16 }
 	surface.request_to_generate_chunks(req_pos, 0)
 
-	-- Clone from north and south. NOTE: This WILL fire 2 times
-	-- for each chunk due to asynchronus nature of this event.
-	-- Both sides contain arbitary amount of chunks, some positions
-	-- when inverted will be still in process of generation or not
-	-- generated at all. It is important to perform 2 passes to make
-	-- sure everything is cloned properly. Normally we would use mutex
-	-- but this is not reliable in this environment.
+	--[[
+        @En
+        Clone from north and south. NOTE: This WILL fire 2 times for each chunk
+        due to asynchronus nature of this event. Both sides contain arbitary
+        amount of chunks, some positions when inverted will be still in process
+        of generation or not generated at all. It is important to perform
+        2 passes to make sure everything is cloned properly. Normally we would
+        use mutex but this is not reliable in this environment.
+
+        @RU
+        Клон с севера и юга. ПРИМЕЧАНИЕ. Это БУДЕТ запускаться 2 раза для
+        каждого фрагмента из-за асинхронного характера этого события. Обе
+        стороны содержат произвольное количество блоков, некоторые позиции при
+        инвертировании будут все еще в процессе генерации или не будут
+        генерироваться вообще. Важно выполнить 2 прохода, чтобы убедиться, что
+        все клонировано правильно. Обычно мы использовали бы мьютекс, но в
+        данной среде это ненадежно.
+    --]]
 	Mirror_terrain.clone(event)
 end
 

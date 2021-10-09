@@ -1,4 +1,6 @@
 local Public = {}
+local Noises = require "map.noises"
+
 local LootRaffle = require "functions.loot_raffle"
 local BiterRaffle = require "maps.biter_battles_v2.biter_raffle"
 local bb_config = require "maps.biter_battles_v2.config"
@@ -12,7 +14,6 @@ local math_random = math.random
 local math_abs = math.abs
 local math_sqrt = math.sqrt
 
-local GetNoise = require "utils.get_noise"
 local simplex_noise = require 'utils.simplex_noise'.d2
 local spawn_circle_size = 39
 local ores = {"copper-ore", "iron-ore", "stone", "coal"}
@@ -59,32 +60,6 @@ local function shuffle(tbl)
 	return tbl
 end
 
-local function get_noise(name, pos)
-	local seed = game.surfaces[global.bb_surface_name].map_gen_settings.seed
-	local noise_seed_add = 25000
-	if name == 1 then
-		local noise = simplex_noise(pos.x * 0.0042, pos.y * 0.0042, seed)
-		seed = seed + noise_seed_add
-		noise = noise + simplex_noise(pos.x * 0.031, pos.y * 0.031, seed) * 0.08
-		seed  = seed + noise_seed_add
-		noise = noise + simplex_noise(pos.x * 0.1, pos.y * 0.1, seed) * 0.025
-		return noise
-	end
-
-	if name == 2 then
-		local noise = simplex_noise(pos.x * 0.011, pos.y * 0.011, seed)
-		seed = seed + noise_seed_add
-		noise = noise + simplex_noise(pos.x * 0.08, pos.y * 0.08, seed) * 0.2
-		return noise
-	end
-
-	if name == 3 then
-		local noise = simplex_noise(pos.x * 0.005, pos.y * 0.005, seed)
-		noise = noise + simplex_noise(pos.x * 0.02, pos.y * 0.02, seed) * 0.3
-		noise = noise + simplex_noise(pos.x * 0.15, pos.y * 0.15, seed) * 0.025
-		return noise
-	end
-end
 
 local function create_mirrored_tile_chain(surface, tile, count, straightness)
 	if not surface then return end
@@ -180,7 +155,7 @@ local river_width_half = math_floor(bb_config.border_river_width * -0.5)
 function is_horizontal_border_river(pos)
 	if pos.y < river_y_1 then return false end
 	if pos.y > river_y_2 then return false end
-	if pos.y >= river_width_half - (math_abs(get_noise(1, pos)) * 4) then return true end
+	if pos.y >= river_width_half - (math_abs(Noises.river( pos)) * 4) then return true end
 	return false
 end
 
@@ -195,7 +170,7 @@ local function generate_starting_area(pos, distance_to_center, surface)
 		return
 	end
 
-	local noise = get_noise(2, pos) * noise_multiplier
+	local noise = Noises.u2(pos) * noise_multiplier
 	local distance_from_spawn_wall = distance_to_center + noise - spawn_wall_radius
 	-- distance_from_spawn_wall is the difference between the distance_to_center (with added noise) 
 	-- and our spawn_wall radius (spawn_wall_radius=116), i.e. how far are we from the ring with radius spawn_wall_radius.
@@ -228,7 +203,7 @@ local function generate_starting_area(pos, distance_to_center, surface)
 	end
 
 	if surface.can_place_entity({name = "wooden-chest", position = pos}) and surface.can_place_entity({name = "coal", position = pos}) then
-		local noise_2 = get_noise(3, pos)
+		local noise_2 = Noises.u3(pos)
 		if noise_2 < 0.40 then
 			if noise_2 > -0.40 then
 				if distance_from_spawn_wall > -1.75 and distance_from_spawn_wall < 0 then				
@@ -332,7 +307,7 @@ local function is_biter_area(position)
 	local a = bitera_area_distance - (math_abs(position.x) * biter_area_angle)	
 	if position.y - 70 > a then return false end
 	if position.y + 70 < a then return true end	
-	if position.y + (get_noise(3, position) * 64) > a then return false end
+	if position.y + (Noises.u3(position) * 64) > a then return false end
 	return true
 end
 
@@ -386,9 +361,8 @@ local function draw_biter_area(surface, left_top_x, left_top_y)
 end
 
 local function mixed_ore(surface, left_top_x, left_top_y)
-	local seed = game.surfaces[global.bb_surface_name].map_gen_settings.seed
 	
-	local noise = GetNoise("bb_ore", {x = left_top_x + 16, y = left_top_y + 16}, seed)
+	local noise = Noises.ore({x = left_top_x + 16, y = left_top_y + 16})
 
 	--Draw noise text values to determine which chunks are valid for mixed ore.
 	--rendering.draw_text{text = noise, surface = game.surfaces.biter_battles, target = {x = left_top_x + 16, y = left_top_y + 16}, color = {255, 255, 255}, scale = 2, font = "default-game"}
@@ -401,7 +375,7 @@ local function mixed_ore(surface, left_top_x, left_top_y)
 		for y = 0, 31, 1 do
 			local pos = {x = left_top_x + x, y = left_top_y + y}
 			if surface.can_place_entity({name = "iron-ore", position = pos}) then
-				local noise = GetNoise("bb_ore", pos, seed)
+				noise = Noises.ore(pos)
 				if noise > 0.72 then
 					local i = math_floor(noise * 25 + math_abs(pos.x) * 0.05) % 4 + 1
 					local amount = (math_random(800, 1000) + math_sqrt(pos.x ^ 2 + pos.y ^ 2) * 3) * mixed_ore_multiplier[i]

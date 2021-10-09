@@ -1,5 +1,43 @@
 local Public = {}
 
+Public.game_teams_types = {
+    'NS' , --[[ forces_names[[0--(3+0)] + 2 +  0] ]]
+    'EW' , --[[ forces_names[[0--(3+0)] + 2 +  4] ]]
+    'NE' , --[[ forces_names[[0--(3+0)] + 2 +  8] ]]
+    'NW' , --[[ forces_names[[0--(3+0)] + 2 + 12] ]]
+    'NS4', --[[ forces_names[[0--(3+4)] + 2 +  0] ]]
+    'NE4', --[[ forces_names[[0--(3+4)] + 2 +  8] ]]
+}
+
+Public.forces_names = {
+	'spectator' ,
+	--[[ NS  game [ 2- 5] ]]
+	--[[ NS4 game [ 2-13] ]]
+	'north'     , 'north_biters',
+	'south'     , 'south_biters',
+	--[[ EW  game [10-13] ]]
+	'east'      , 'east_biters',
+	'west'      , 'west_biters',
+	--[[ NE  game [10-13] ]]
+	--[[ NE4 game [10-17] ]]
+	'northeast' , 'northeast_biters',
+	'soutswest' , 'soutswest_biters',
+	--[[ NW  game [14-17] ]]
+	'northwest' , 'northwest_biters',
+	'southeast' , 'southeast_biters',
+}
+
+Public.forces_spawns = {
+	--[[north]]     {  0,-44},
+	--[[south]]     {  0, 44},
+	--[[east]]      { 44,  0},
+	--[[west]]      {-44,  0},
+	--[[northeast]] { 32,-32},
+	--[[soutswest]] {-32, 32},
+	--[[southeast]] { 32, 32},
+	--[[northwest]] {-32,-32},
+}
+
 Public.disabled_technologies = {
 	"artillery",
 	"artillery-shell-range-1",
@@ -143,7 +181,7 @@ Public.spawn_ore = {
 }
 
 Public.difficulties = {
-	
+
 	[1] = {name = "I'm Too Young to Die", str = "25%", value = 0.25, color = {r=0.00, g=0.45, b=0.00}, print_color = {r=0.00, g=0.9, b=0.00}},
 	[2] = {name = "Piece of Cake", str = "50%", value = 0.5, color = {r=0.00, g=0.35, b=0.00}, print_color = {r=0.00, g=0.7, b=0.00}},
 	[3] = {name = "Easy", str = "75%", value = 0.75, color = {r=0.00, g=0.25, b=0.00}, print_color = {r=0.00, g=0.5, b=0.00}},

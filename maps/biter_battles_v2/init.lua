@@ -12,11 +12,10 @@ function Public.initial_setup()
 	game.map_settings.pollution.enabled = false
 	game.map_settings.enemy_expansion.enabled = false
 
-	game.create_force("north")
-	game.create_force("south")
-	game.create_force("north_biters")
-	game.create_force("south_biters")
-	game.create_force("spectator")
+	for _, force_name in pairs(Tables.forces_names) do
+		game.create_force(force_name)
+	end
+
 
 	game.forces.spectator.research_all_technologies()
 
@@ -59,7 +58,7 @@ function Public.initial_setup()
 
 	global.gui_refresh_delay = 0
 	global.game_lobby_active = true
-	global.bb_debug = false
+	global.bb_debug = true
 	global.bb_settings = {
 		--TEAM SETTINGS--
 		["team_balancing"] = true,			--Should players only be able to join a team that has less or equal members than the opposing team?
@@ -233,55 +232,69 @@ function Public.forces()
 	end
 
 	local surface = game.surfaces[global.bb_surface_name]
+	local forces_names = Tables.forces_names
+	local forces_spawns = Tables.forces_spawns
+	local force_player = game.forces.player
+	local force_spectator = game.forces.spectator
+	local forces_teams = {}
+	local forces_biters = {}
+	for key, force_name in pairs(forces_names) do
+		if key ~= 1 then
+			if key % 2 == 0 then
+				table.insert(forces_teams, game.forces[force_name])
+			else
+				table.insert(forces_biters, game.forces[force_name])
+			end
+		end
+	end
 
-	local f = game.forces["north"]
-	f.set_spawn_position({0, -44}, surface)
-	f.set_cease_fire('player', true)
-	f.set_friend("spectator", true)
-	f.set_friend("south_biters", true)
-	f.share_chart = true
+	for key, value in pairs(game.forces) do
+		game.print(value)
+	end
 
-	local f = game.forces["south"]
-	f.set_spawn_position({0, 44}, surface)
-	f.set_cease_fire('player', true)
-	f.set_friend("spectator", true)
-	f.set_friend("north_biters", true)
-	f.share_chart = true
+	for key, force in pairs(forces_teams) do
+		force.set_spawn_position(forces_spawns[key], surface)
+		force.set_cease_fire(force_player, true)
+		force.set_friend(force_spectator, true)
+		for key_biters, force_biters in pairs(forces_biters) do
+			force.set_friend(force_biters, key ~= key_biters)
+		end
+		force.share_chart = true
+	end
 
-	local f = game.forces["north_biters"]
-	f.set_friend("south_biters", true)
-	f.set_friend("south", true)
-	f.set_friend("player", true)
-	f.set_friend("spectator", true)
-	f.share_chart = false
-	global.dead_units[f.index] = fifo.create(global.bb_fifo_size)
+	for key, force in pairs(forces_biters) do
+		force.set_friend(force_player, true)
+		force.set_friend(force_spectator, true)
+		for key_biters, force_biters in pairs(forces_biters) do
+			force.set_friend(force_biters, true)
+		end
+		for key_teams, force_teams in pairs(forces_teams) do
+			force.set_friend(force_teams, key ~= key_teams)
+		end
+		force.share_chart = false
+		global.dead_units[force.index] = fifo.create(global.bb_fifo_size)
+	end
 
-	local f = game.forces["south_biters"]
-	f.set_friend("north_biters", true)
-	f.set_friend("north", true)
-	f.set_friend("player", true)
-	f.set_friend("spectator", true)
-	f.share_chart = false
-	global.dead_units[f.index] = fifo.create(global.bb_fifo_size)
+	force_spectator.set_spawn_position({0,0},surface)
+	force_spectator.technologies["toolbelt"].researched = true
+	for key_biters, force_biters in pairs(forces_biters) do
+		force_spectator.set_cease_fire(force_biters, true)
+	end
+	for key_teams, force_teams in pairs(forces_teams) do
+		force_spectator.set_friend(force_teams, true)
+	end
+	force_spectator.set_cease_fire(force_player, true)
+	force_spectator.share_chart = true
 
-	local f = game.forces["spectator"]
-	f.set_spawn_position({0,0},surface)
-	f.technologies["toolbelt"].researched = true
-	f.set_cease_fire("north_biters", true)
-	f.set_cease_fire("south_biters", true)
-	f.set_friend("north", true)
-	f.set_friend("south", true)
-	f.set_cease_fire("player", true)
-	f.share_chart = true
-
-	local f = game.forces["player"]
-	f.set_spawn_position({0,0},surface)
-	f.set_cease_fire('spectator', true)
-	f.set_cease_fire("north_biters", true)
-	f.set_cease_fire("south_biters", true)
-	f.set_cease_fire('north', true)
-	f.set_cease_fire('south', true)
-	f.share_chart = false
+	force_player.set_spawn_position({0,0},surface)
+	force_player.set_cease_fire(force_spectator, true)
+	for key_biters, force_biters in pairs(forces_biters) do
+		force_spectator.set_cease_fire(force_biters, true)
+	end
+	for key_teams, force_teams in pairs(forces_teams) do
+		force_spectator.set_cease_fire(force_teams, true)
+	end
+	force_player.share_chart = false
 
 	for _, force in pairs(game.forces) do
 		for key, tech_name in pairs(Tables.disabled_technologies) do
@@ -296,18 +309,20 @@ function Public.forces()
 		global.bb_threat_income[force.name] = 0
 		global.bb_threat[force.name] = 0
 	end
-	for _, force in pairs(Tables.ammo_modified_forces_list) do
+	for _, force in pairs(forces_teams) do
 		for ammo_category, value in pairs(Tables.base_ammo_modifiers) do
-			game.forces[force]
-				.set_ammo_damage_modifier(ammo_category, value)
+			force.set_ammo_damage_modifier(ammo_category, value)
+		end
+		for turret_category, value in pairs(Tables.base_turret_attack_modifiers) do
+			force.set_turret_attack_modifier(turret_category, value)
 		end
 	end
 
-	for _, force in pairs(Tables.ammo_modified_forces_list) do
-		for turret_category, value in pairs(Tables.base_turret_attack_modifiers) do
-			game.forces[force]
-				.set_turret_attack_modifier(turret_category, value)
-		end
+	for ammo_category, value in pairs(Tables.base_ammo_modifiers) do
+		force_spectator.set_ammo_damage_modifier(ammo_category, value)
+	end
+	for turret_category, value in pairs(Tables.base_turret_attack_modifiers) do
+		force_spectator.set_turret_attack_modifier(turret_category, value)
 	end
 
 end

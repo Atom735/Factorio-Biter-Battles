@@ -1,7 +1,13 @@
 local Public = {}
 
--- List of forces that will be affected by ammo modifier
-Public.ammo_modified_forces_list = {"north", "south", "spectator"}
+Public.disabled_technologies = {
+	"artillery",
+	"artillery-shell-range-1",
+	"artillery-shell-speed-1",
+	"atomic-bomb",
+	"cliff-explosives",
+	"land-mine",
+}
 
 -- Ammo modifiers via set_ammo_damage_modifier
 -- [ammo_category] = value

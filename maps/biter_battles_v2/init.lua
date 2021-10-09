@@ -284,12 +284,9 @@ function Public.forces()
 	f.share_chart = false
 
 	for _, force in pairs(game.forces) do
-		game.forces[force.name].technologies["artillery"].enabled = false
-		game.forces[force.name].technologies["artillery-shell-range-1"].enabled = false
-		game.forces[force.name].technologies["artillery-shell-speed-1"].enabled = false
-		game.forces[force.name].technologies["atomic-bomb"].enabled = false
-		game.forces[force.name].technologies["cliff-explosives"].enabled = false
-		game.forces[force.name].technologies["land-mine"].enabled = false
+		for key, tech_name in pairs(Tables.disabled_technologies) do
+			game.forces[force.name].technologies[tech_name].enabled = false
+		end
 		game.forces[force.name].research_queue_enabled = true
 		global.target_entities[force.index] = {}
 		global.spy_fish_timeout[force.name] = 0

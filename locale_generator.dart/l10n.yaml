@@ -1,0 +1,23 @@
+gui:
+  next_round_params:
+    en: Next round options
+    ru: Параметры следующего раунда
+map_gen_gui:
+  NS:
+    en: North vs South
+    ru: Север против Юга
+  EW:
+    en: East vs West
+    ru: Запад против Востока
+  NE:
+    en: North-East vs South-West
+    ru: Северо-запад против Юго-востока
+  NW:
+    en: North-West vs South-East
+    ru: Северо-восток против Юго-запада
+  NS4:
+    en: North vs South vs East vs West
+    ru: Север против Юга против Запада против Востока
+  NE4:
+    en: North-East vs South-West vs North-West vs South-East
+    ru: Северо-запад против Юго-востока против Северо-востока против Юго-запада

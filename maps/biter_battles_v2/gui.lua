@@ -26,13 +26,13 @@ local gui_values = {
 		tech_spy = "spy-south-tech", prod_spy = "spy-south-prod"}
 	}
 
-local function clear_copy_history(player) 
+local function clear_copy_history(player)
 	if player and player.valid then
 		for i=1,21 do
 			-- Imports blueprint of single burner miner into the cursor stack
 			stack = player.cursor_stack.import_stack("0eNp9jkEKgzAURO8y67jQhsbmKqUUrR/5kHwliVKR3L3GbrrqcoaZN7OjdwvNgSXB7uDXJBH2viPyKJ0rXtpmggUn8lCQzhfVL0EoVJ6FZayGwM4hK7AM9Iat80OBJHFi+uJOsT1l8T2FI/AXpDBP8ehOUvYPnjYKG2x1bXMhn1fsz3OFlUI8801ba3NrzEVroxud8wdvA0sn")
 			player.add_to_clipboard(player.cursor_stack)
-			player.clear_cursor() 
+			player.clear_cursor()
 		end
 	end
 end
@@ -173,7 +173,7 @@ function Public.create_main_gui(player)
 		local l = t.add  { type = "label", caption = c}
 		l.style.font = "default"
 		l.style.font_color = { r=0.22, g=0.88, b=0.22}
-		
+
 		-- Tech button
 		if is_spec and not global.chosen_team[player.name] then
 			add_tech_button(t, gui_value)
@@ -197,9 +197,9 @@ function Public.create_main_gui(player)
 		--l.style.minimal_width = 25
 		local biter_force = game.forces[gui_value.biter_force]
 		local tooltip = gui_value.t1 .. "\nDamage: " .. (biter_force.get_ammo_damage_modifier("melee") + 1) * 100 .. "%\nRevive: " .. global.reanim_chance[biter_force.index] .. "%"
-		
-		l.tooltip = tooltip		
-		
+
+		l.tooltip = tooltip
+
 		local evo = math.floor(1000 * global.bb_evolution[gui_value.biter_force]) * 0.1
 		local l = t.add  {type = "label", caption = evo .. "%"}
 		l.style.minimal_width = 40
@@ -310,7 +310,7 @@ function join_team(player, force_name, forced_join)
 		local p = surface.find_non_colliding_position("character", game.forces[force_name].get_spawn_position(surface), 16, 0.5)
 		if not p then
 			game.print("No spawn position found for " .. player.name .. "!", {255, 0, 0})
-			return 
+			return
 		end
 		player.teleport(p, surface)
 		player.force = game.forces[force_name]

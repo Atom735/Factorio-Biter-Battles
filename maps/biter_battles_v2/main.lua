@@ -17,6 +17,10 @@ require "maps.biter_battles_v2.sciencelogs_tab"
 require 'maps.biter_battles_v2.commands'
 require "modules.spawners_contain_biters"
 
+local seed_text_fields = {}
+local seed_regen_buttons = {}
+local GuiFactory = require 'gui.factory'
+
 local function on_player_joined_game(event)
 	local surface = game.surfaces[global.bb_surface_name]
 	local player = game.players[event.player_index]
@@ -25,6 +29,8 @@ local function on_player_joined_game(event)
 	end
 	Functions.create_map_intro_button(player)
 	Team_manager.draw_top_toggle_button(player)
+
+	GuiFactory.window(player, 'Map settings', true)
 end
 
 local function on_gui_click(event)
@@ -35,6 +41,17 @@ local function on_gui_click(event)
 
 	if Functions.map_intro_click(player, element) then return end
 	Team_manager.gui_click(event)
+
+	if table.contains(seed_regen_buttons, element) then
+		local surface = game.surfaces[global.bb_surface_name]
+		local seed = math.random(-2147483648, 2147483647)
+		surface.map_gen_settings.seed = seed
+		for key, value in pairs(seed_text_fields) do
+			if value.valid then
+				value.text = tostring(seed)
+			end
+		end
+	end
 end
 
 local function on_research_finished(event)
@@ -156,11 +173,10 @@ local function on_chunk_generated(event)
 
         @Ru Создавайте структуры только для одной команды.
     --]]
-
 	local pos = event.area.left_top
-	if pos.y < 0 then
+	-- if pos.y < 0 then
 		Terrain.generate(event)
-	end
+	-- end
 	--[[
         @En
         Request chunk for opposite side, maintain the lockstep.
@@ -197,7 +213,7 @@ local function on_chunk_generated(event)
         все клонировано правильно. Обычно мы использовали бы мьютекс, но в
         данной среде это ненадежно.
     --]]
-	Mirror_terrain.clone(event)
+	-- Mirror_terrain.clone(event)
 end
 
 local function on_entity_cloned(event)

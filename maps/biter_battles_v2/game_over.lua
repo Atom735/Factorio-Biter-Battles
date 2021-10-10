@@ -316,11 +316,12 @@ function Public.server_restart()
         Server.to_discord_bold(table.concat {'*** ', message, ' ***'})
 
 	local prev_surface = global.bb_surface_name
-        Init.tables()
+
+    Init.tables()
 	Init.playground_surface()
 	Init.forces()
 	Init.draw_structures()
-        Init.load_spawn()
+    Init.load_spawn()
 
         for _, player in pairs(game.players) do
             Functions.init_player(player)
@@ -424,7 +425,7 @@ function Public.silo_death(event)
         set_victory_time()
 		north_players = "NORTH PLAYERS: \\n"
 		south_players = "SOUTH PLAYERS: \\n"
-		
+
         for _, player in pairs(game.connected_players) do
             player.play_sound {path = "utility/game_won", volume_modifier = 1}
             if player.gui.left["bb_main_gui"] then
@@ -447,14 +448,14 @@ function Public.silo_death(event)
         if global.tm_custom_name[global.bb_game_won_by_team] then
             c = global.tm_custom_name[global.bb_game_won_by_team]
 		end
-		
+
         north_evo = math.floor(1000 * global.bb_evolution["north_biters"]) * 0.1
         north_threat = math.floor(global.bb_threat["north_biters"])
         south_evo = math.floor(1000 * global.bb_evolution["south_biters"]) * 0.1
         south_threat = math.floor(global.bb_threat["south_biters"])
 
 		discord_message = "*** Team " .. global.bb_game_won_by_team .. " has won! ***" .. "\\n" ..
-							global.victory_time .. "\\n\\n" .. 
+							global.victory_time .. "\\n\\n" ..
 							"North Evo: " .. north_evo .. "%\\n" ..
                             "North Threat: " .. north_threat .. "\\n\\n" ..
                             "South Evo: " .. south_evo .. "%\\n" ..

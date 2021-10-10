@@ -2,14 +2,12 @@ local Public = {}
 
 --[[ !!! Don't sorting this, scenario uses indexes !!! ]]
 Public.game_teams_types = {
-    'NS' , --[[ forces_names[[0--(3+0)] + 2 +  0] ]]
-    'EW' , --[[ forces_names[[0--(3+0)] + 2 +  4] ]]
-    'NE' , --[[ forces_names[[0--(3+0)] + 2 +  8] ]]
-    'NW' , --[[ forces_names[[0--(3+0)] + 2 + 12] ]]
-    'NS4', --[[ forces_names[[0--(3+4)] + 2 +  0] ]]
-    'EW4', -- duplicate
-    'NE4', --[[ forces_names[[0--(3+4)] + 2 +  8] ]]
-    'NW4', -- duplicate
+    'NS' , --[[ forces_names[[0--(3+0)] + 2 +  0]  north Vs south ]]
+    'EW' , --[[ forces_names[[0--(3+0)] + 2 +  4]  east Vs west ]]
+    'NE' , --[[ forces_names[[0--(3+0)] + 2 +  8]  northeast Vs soutswest ]]
+    'NW' , --[[ forces_names[[0--(3+0)] + 2 + 12]  northwest Vs southeast ]]
+    'NS4', --[[ forces_names[[0--(3+4)] + 2 +  0]  north Vs south Vs east Vs west ]]
+    'NE4', --[[ forces_names[[0--(3+4)] + 2 +  8]  northeast Vs soutswest Vs northwest Vs southeast ]]
 }
 
 

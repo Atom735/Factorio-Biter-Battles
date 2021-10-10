@@ -12,7 +12,8 @@
     "commands",
     "log",
     "script",
-    "serpent"
+    "serpent",
+    "rendering"
   ],
   "Lua.hint.enable": true,
   "Lua.hint.setType": true,

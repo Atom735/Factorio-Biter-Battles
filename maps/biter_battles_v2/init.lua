@@ -66,12 +66,14 @@ function Public.initial_setup()
 	}
 
 
-	global.bb_teams_type = Tables.game_teams_types[1]
+	global.bb_teams_type = Tables.game_teams_types[6]
 	global.bb_map_params = {
 		border_river_width    = 44,
 		spawn_circle_size     = 39,
 		reflect_rotate        = false,
 		mixed_ores            = true,
+		mixed_ores_entities   = {"copper-ore", "iron-ore", "stone", "coal"},
+		-- [[mixed_ore_multiplier order is based on the ores variable]]
 		mixed_ores_multiplier = {1, 1, 1, 1},
 	}
 

@@ -2,7 +2,7 @@ local DirectionTranslation = require 'map.direction_translation'
 
 local Public = {
     ['NS' ] = {
-        tile_origin_pos = function (pos)
+        direction_translator = function (pos)
             if pos.y >= 0 then
                 return DirectionTranslation.I
             end
@@ -15,9 +15,12 @@ local Public = {
         distance_to_main_side = function (pos)
             return pos.y
         end,
+        distance_to_second_side = function (pos)
+            return pos.y
+        end,
     },
     ['EW' ] = {
-        tile_origin_pos = function (pos)
+        direction_translator = function (pos)
             if pos.x >= 0 then
                 return DirectionTranslation.I
             end
@@ -30,9 +33,12 @@ local Public = {
         distance_to_main_side = function (pos)
             return pos.x
         end,
+        distance_to_second_side = function (pos)
+            return pos.x
+        end,
     },
     ['NE' ] = {
-        tile_origin_pos = function (pos)
+        direction_translator = function (pos)
             if pos.x - pos.y >= 0 then
                 return DirectionTranslation.I
             end
@@ -45,9 +51,12 @@ local Public = {
         distance_to_main_side = function (pos)
             return pos.x - pos.y
         end,
+        distance_to_second_side = function (pos)
+            return pos.x - pos.y
+        end,
     },
     ['NW' ]  = {
-        tile_origin_pos = function (pos)
+        direction_translator = function (pos)
             if pos.x + pos.y + 1 >= 0 then
                 return DirectionTranslation.I
             end
@@ -60,9 +69,12 @@ local Public = {
         distance_to_main_side = function (pos)
             return pos.x + pos.y + 1
         end,
+        distance_to_second_side = function (pos)
+            return pos.x + pos.y + 1
+        end,
     },
     ['NS4'] = {
-        tile_origin_pos = function (pos)
+        direction_translator = function (pos)
             if pos.x - pos.y >= 0 then
                 if pos.x + pos.y + 1 >= 0 then
                     return DirectionTranslation.I
@@ -82,9 +94,12 @@ local Public = {
         distance_to_main_side = function (pos)
             return pos.y - pos.x
         end,
+        distance_to_second_side = function (pos)
+            return pos.x + pos.y + 1
+        end,
     },
     ['NE4'] = {
-        tile_origin_pos = function (pos)
+        direction_translator = function (pos)
             if pos.y >= 0 then
                 if pos.x >= 0 then
                     return DirectionTranslation.I
@@ -103,6 +118,9 @@ local Public = {
         end,
         distance_to_main_side = function (pos)
             return pos.y
+        end,
+        distance_to_second_side = function (pos)
+            return pos.x
         end,
     },
 }

@@ -36,11 +36,12 @@ function Public.draw(surface, seed)
     local outer_noise = TerrainParams.outer_circle.noise
     local inner_radius = TerrainParams.inner_circle.radius
     local inner_sand = TerrainParams.inner_circle.sand
-    local fish_factor = TerrainParams.fish_factor
+    local fish_chance = TerrainParams.fish_chance
 
     surface.request_to_generate_chunks({0, 0}, (outer_radius) / 32 + 1)
     surface.force_generate_chunk_requests()
 
+    local random = game.create_random_generator(seed)
     local tiles = {}
     local entities = {}
 
@@ -77,8 +78,7 @@ function Public.draw(surface, seed)
                 table_insert(tiles, {name = tile_name, position = pos_lb})
                 table_insert(tiles, {name = tile_name, position = pos_lt})
                 if tile_name == 'deepwater' then
-                    local fish_noise = math_abs(Noises.random(pos_rb, seed))
-                    if fish_noise > fish_factor then
+                    if random(0, 100) < fish_chance then
                         table_insert(entities, pos_rb)
                         table_insert(entities, pos_rt)
                         table_insert(entities, pos_lb)

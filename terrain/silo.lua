@@ -17,7 +17,8 @@ local function generate_silo(surface, seed, direction, force)
     local silo_distance = TerrainParams.silo_distance
     local silo_safe_area = TerrainParams.silo_safe_area
 
-    local origin_offset = Noises.random({x = 0.0, y = 0.0}, seed) * 0.5 * silo_distance
+    local random = game.create_random_generator(seed)
+    local origin_offset = random(-0.75, 0.75) * silo_distance
     local dv = DirectionVectors[direction]
 
     -- LuaFormatter off

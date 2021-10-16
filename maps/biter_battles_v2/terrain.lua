@@ -552,8 +552,8 @@ local TerrainNg = require 'terrain.main'
 function Public.draw_structures()
 
     local surface = game.surfaces[global.bb_surface_name]
-    -- Public.draw_spawn_area(surface)
-    -- Public.clear_ore_in_main(surface)
+    Public.draw_spawn_area(surface)
+    Public.clear_ore_in_main(surface)
     Public.generate_additional_rocks(surface)
     TerrainNg.draw_structures()
     -- Public.generate_spawn_goodies(surface)

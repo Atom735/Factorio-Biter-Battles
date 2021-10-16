@@ -15,7 +15,8 @@ local math_sqrt = math.sqrt
 local Noises = require 'utils.noises'
 
 local simplex_noise = require 'utils.simplex_noise'
-local spawn_circle_size = 39
+local spawn_circle_radius = 39
+
 local ores = {'copper-ore', 'iron-ore', 'stone', 'coal'}
 -- mixed_ore_multiplier order is based on the ores variable
 local mixed_ore_multiplier = {1, 1, 1, 1}
@@ -133,14 +134,6 @@ local function draw_noise_ore_patch(position, name, surface, radius, richness)
 end
 
 
-local function is_within_spawn_circle(pos)
-    if math_abs(pos.x) > spawn_circle_size then return false end
-    if math_abs(pos.y) > spawn_circle_size then return false end
-    if math_sqrt(pos.x ^ 2 + pos.y ^ 2) > spawn_circle_size then return false end
-    return true
-end
-
-
 local river_y_1 = bb_config.border_river_width * -1.5
 local river_y_2 = bb_config.border_river_width * 1.5
 local river_width_half = math_floor(bb_config.border_river_width * -0.5)
@@ -163,7 +156,7 @@ local function generate_starting_area(pos, distance_to_center, surface)
     if (distance_to_center + min_noise - spawn_wall_radius) > 4.5 then return end
 
     local seed = game.surfaces[global.bb_surface_name].map_gen_settings.seed
-    local noise = Noises.wall_distance(pos, seed) * noise_multiplier
+    local noise = Noises.wall_distance(pos, seed) * 1.2 * noise_multiplier
     local distance_from_spawn_wall = distance_to_center + noise - spawn_wall_radius
     -- distance_from_spawn_wall is the difference between the distance_to_center (with added noise)
     -- and our spawn_wall radius (spawn_wall_radius=116), i.e. how far are we from the ring with radius spawn_wall_radius.
@@ -197,7 +190,7 @@ local function generate_starting_area(pos, distance_to_center, surface)
 
     if surface.can_place_entity({name = 'wooden-chest', position = pos})
       and surface.can_place_entity({name = 'coal', position = pos}) then
-        local noise_2 = Noises.wall_entity(pos, seed)
+        local noise_2 = Noises.wall_entity(pos, seed) * 1.35
         if noise_2 < 0.40 then
             if noise_2 > -0.40 then
                 if distance_from_spawn_wall > -1.75 and distance_from_spawn_wall < 0 then
@@ -244,7 +237,7 @@ local function generate_river(surface, left_top_x, left_top_y)
         for y = 0, 31, 1 do
             local pos = {x = left_top_x + x, y = left_top_y + y}
             local distance_to_center = math_sqrt(pos.x ^ 2 + pos.y ^ 2)
-            if is_horizontal_border_river(pos) and distance_to_center > spawn_circle_size - 2 then
+            if is_horizontal_border_river(pos) and distance_to_center > spawn_circle_radius - 2 then
                 surface.set_tiles({{name = 'deepwater', position = pos}})
                 if math_random(1, 64) == 1 then
                     local e = surface.create_entity({name = 'fish', position = pos})
@@ -407,23 +400,55 @@ function Public.generate(event)
 end
 
 
-function Public.draw_spawn_circle(surface)
-    local tiles = {}
-    for x = spawn_circle_size * -1, -1, 1 do
-        for y = spawn_circle_size * -1, -1, 1 do
-            local pos = {x = x, y = y}
-            local distance_to_center = math_sqrt(pos.x ^ 2 + pos.y ^ 2)
-            if distance_to_center <= spawn_circle_size then
-                table_insert(tiles, {name = 'deepwater', position = pos})
+-- LuaFormatter off
+local spawn_circle_params = {
+    outer = {
+        radius = 39.0,
+        noise = 10.0,
+    },
+    inner = {
+        radius = 9.5,
+        sand = 7.0,
+    },
+    path_width = 5.0,
+}
+-- LuaFormatter on
 
-                if distance_to_center < 9.5 then
-                    table_insert(tiles, {name = 'refined-concrete', position = pos})
-                    if distance_to_center < 7 then
-                        table_insert(tiles, {name = 'sand-1', position = pos})
+function Public.draw_spawn_circle(surface, seed)
+    local outer_radius = spawn_circle_params.outer.radius
+    local outer_noise = spawn_circle_params.outer.noise
+    local inner_radius = spawn_circle_params.inner.radius
+    local inner_sand = spawn_circle_params.inner.sand
+    local tiles = {}
+    seed = seed or game.surfaces[global.bb_surface_name].map_gen_settings.seed
+    for x = 0, outer_radius, 1 do
+        for y = 0, outer_radius, 1 do
+            local pos_rb = {x = x, y = y}
+            local pos_rt = {x = x, y = -y - 1}
+            local pos_lb = {x = x, y = y}
+            local pos_lt = {x = x, y = -y - 1}
+            local r = math_sqrt(x ^ 2 + y ^ 2)
+            local outer_r = outer_radius
+            local outer_r2 = outer_radius * 0.7
+            if outer_noise >= 1.0 then
+                local noise = math_abs(Noises.spawn_circle_radius(pos_rb, seed))
+                outer_r = outer_r - noise * outer_noise
+                outer_r2 = outer_r - (noise + 0.5) * 5
+            end
+            if r <= outer_r then
+                local tile_name = 'deepwater'
+                if r > outer_r2 then tile_name = 'water' end
+                if r < inner_radius then
+                    if r < inner_sand then
+                        tile_name = 'sand-1'
+                    else
+                        tile_name = 'refined-concrete'
                     end
-                    --	else
-                    --
                 end
+                table_insert(tiles, {name = tile_name, position = pos_rb})
+                table_insert(tiles, {name = tile_name, position = pos_rt})
+                table_insert(tiles, {name = tile_name, position = pos_lb})
+                table_insert(tiles, {name = tile_name, position = pos_lt})
             end
         end
     end
@@ -435,9 +460,9 @@ function Public.draw_spawn_circle(surface)
     surface.set_tiles(tiles, true)
 
     for i = 1, #tiles, 1 do
-        if tiles[i].name == 'deepwater' then
+        if tiles[i].name == 'deepwater' or tiles[i].name == 'water' then
             if math_random(1, 48) == 1 then
-                local e = surface.create_entity({name = 'fish', position = tiles[i].position})
+                surface.create_entity({name = 'fish', position = tiles[i].position})
             end
         end
     end
@@ -661,7 +686,7 @@ function Public.restrict_landfill(surface, inventory, tiles)
         if check_position.y > 0 then
             check_position = {x = check_position.x * -1, y = (check_position.y * -1) - 1}
         end
-        if is_horizontal_border_river(check_position) or distance_to_center < spawn_circle_size then
+        if is_horizontal_border_river(check_position) or distance_to_center < spawn_circle_radius then
             surface.set_tiles({{name = t.old_tile.name, position = t.position}}, true)
         end
     end
@@ -702,5 +727,6 @@ function Public.draw_structures()
     Public.draw_spawn_circle(surface)
     -- Public.generate_spawn_goodies(surface)
 end
+
 
 return Public

@@ -33,6 +33,11 @@ local noise_params = {
         {seed =     0, size = 0.0200, weight = 0.300, },
         {seed =     0, size = 0.1500, weight = 0.025, },
     },
+    spawn_circle_radius = {
+        {seed =     0, size = 0.3000, weight = 1.000, },
+        {seed = 25000, size = 0.6000, weight = 0.300, },
+        {seed = 25000, size = 0.9000, weight = 0.025, },
+    },
 }
 -- LuaFormatter on
 
@@ -65,6 +70,9 @@ function Noises.wall_distance(pos, seed) return get_noise(noise_params.wall_dist
 
 
 function Noises.wall_entity(pos, seed) return get_noise(noise_params.wall_entity, pos, seed) end
+
+
+function Noises.spawn_circle_radius(pos, seed) return get_noise(noise_params.spawn_circle_radius, pos, seed) end
 
 
 return Noises

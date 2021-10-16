@@ -17,7 +17,7 @@ break_after_table_lb: true
 break_before_table_rb: true
 chop_down_table: false
 chop_down_kv_table: false
-column_table_limit: 80
+column_table_limit: 120
 table_sep: ","
 extra_sep_at_table_end: true
 break_after_operator: false

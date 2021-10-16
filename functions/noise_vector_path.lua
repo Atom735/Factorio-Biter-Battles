@@ -1,6 +1,6 @@
 --draws lines modified by noise -- mewmew
 
-local simplex_noise = require "utils.simplex_noise".d2
+local simplex_noise = require "utils.simplex_noise"
 
 local function get_brush(size)
 	local vectors = {}
@@ -35,7 +35,7 @@ function noise_vector_entity_path(surface, entity_name, position, base_vector, l
 
 		vector[1] = base_vector[1] + noise * 0.85
 		vector[2] = base_vector[2] + noise_2 * 0.85
-		
+
 		--enforce minimum movement
 		if math.abs(vector[1]) < minimal_movement and math.abs(vector[2]) < minimal_movement then
 			local i = math.random(1,2)
@@ -45,10 +45,10 @@ function noise_vector_entity_path(surface, entity_name, position, base_vector, l
 				vector[i] = minimal_movement
 			end
 		end
-		
+
 		position = {x = position.x + vector[1], y = position.y + vector[2]}
 	end
-	
+
 	return entities
 end
 
@@ -60,7 +60,7 @@ function noise_vector_tile_path(surface, tile_name, position, base_vector, lengt
 	local tiles = {}
 	local minimal_movement = 0.65
 	local brush_vectors = get_brush(brush_size)
-	
+
 	for a = 1, length, 1 do
 		for _, v in pairs(brush_vectors) do
 			local p = {x = position.x + v[1], y = position.y + v[2]}
@@ -77,13 +77,13 @@ function noise_vector_tile_path(surface, tile_name, position, base_vector, lengt
 				tiles[#tiles + 1] = {name = tile_name, position = p}
 			end
 		end
-		
+
 		local noise = simplex_noise(position.x * m, position.y * m, seed_1)
 		local noise_2 = simplex_noise(position.x * m, position.y * m, seed_2)
 
 		vector[1] = base_vector[1] + noise
 		vector[2] = base_vector[2] + noise_2
-			
+
 		if math.abs(vector[1]) < minimal_movement and math.abs(vector[2]) < minimal_movement then
 			local i = math.random(1,2)
 			if vector[i] < 0 then
@@ -91,11 +91,11 @@ function noise_vector_tile_path(surface, tile_name, position, base_vector, lengt
 			else
 				vector[i] = minimal_movement
 			end
-		end	
-		
+		end
+
 		position = {x = position.x + vector[1], y = position.y + vector[2]}
 	end
-	
+
 	return tiles
 end
 

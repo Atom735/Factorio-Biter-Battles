@@ -1,4 +1,4 @@
-local simplex_noise = require 'utils.simplex_noise'.d2
+local simplex_noise = require 'utils.simplex_noise'
 
 --add or use noise templates from here
 local noises = {

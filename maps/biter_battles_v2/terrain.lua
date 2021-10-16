@@ -13,14 +13,12 @@ local math_abs = math.abs
 local math_sqrt = math.sqrt
 
 local Noises = require 'utils.noises'
+local mixed_ore = require 'terrain.mixed_ore'
 local TerrainDebug = require 'terrain.debug'
 
 local simplex_noise = require 'utils.simplex_noise'
 local spawn_circle_radius = 39
 
-local ores = {'copper-ore', 'iron-ore', 'stone', 'coal'}
--- mixed_ore_multiplier order is based on the ores variable
-local mixed_ore_multiplier = {1, 1, 1, 1}
 local rocks = {'rock-huge', 'rock-big', 'rock-big', 'rock-big', 'sand-rock-big'}
 
 local chunk_tile_vectors = {}
@@ -202,22 +200,7 @@ local function generate_starting_area(pos, distance_to_center, surface)
 end
 
 
-local function generate_river(surface, left_top_x, left_top_y)
-    if left_top_y ~= -32 then return end
-    for x = 0, 31, 1 do
-        for y = 0, 31, 1 do
-            local pos = {x = left_top_x + x, y = left_top_y + y}
-            local distance_to_center = math_sqrt(pos.x ^ 2 + pos.y ^ 2)
-            if is_horizontal_border_river(pos) and distance_to_center > spawn_circle_radius - 2 then
-                surface.set_tiles({{name = 'deepwater', position = pos}})
-                if math_random(1, 64) == 1 then
-                    local e = surface.create_entity({name = 'fish', position = pos})
-                end
-            end
-        end
-    end
-end
-
+local generate_river = require'terrain.river'.generate
 
 local scrap_vectors = {}
 for x = -8, 8, 1 do
@@ -323,49 +306,17 @@ local function draw_biter_area(surface, left_top_x, left_top_y)
 end
 
 
-local function mixed_ore(surface, left_top_x, left_top_y)
-    local seed = game.surfaces[global.bb_surface_name].map_gen_settings.seed
-
-    local noise = Noises.ore({x = left_top_x + 16, y = left_top_y + 16}, seed)
-
-    -- Draw noise text values to determine which chunks are valid for mixed ore.
-    -- rendering.draw_text{text = noise, surface = game.surfaces.biter_battles, target = {x = left_top_x + 16, y = left_top_y + 16}, color = {255, 255, 255}, scale = 2, font = "default-game"}
-
-    -- Skip chunks that are too far off the ore noise value.
-    if noise < 0.42 then return end
-
-    -- Draw the mixed ore patches.
-    for x = 0, 31, 1 do
-        for y = 0, 31, 1 do
-            local pos = {x = left_top_x + x, y = left_top_y + y}
-            if surface.can_place_entity({name = 'iron-ore', position = pos}) then
-                local noise = Noises.ore(pos, seed)
-                if noise > 0.72 then
-                    local i = math_floor(noise * 25 + math_abs(pos.x) * 0.05) % 4 + 1
-                    local amount = (math_random(800, 1000) + math_sqrt(pos.x ^ 2 + pos.y ^ 2) * 3)
-                                     * mixed_ore_multiplier[i]
-                    surface.create_entity({name = ores[i], position = pos, amount = amount})
-                end
-            end
-        end
-    end
-
-    if left_top_y == -32 and math_abs(left_top_x) <= 32 then
-        for _, e in pairs(surface.find_entities_filtered({
-            name = 'character', invert = true, area = {{-12, -12}, {12, 12}},
-        })) do e.destroy() end
-    end
-end
-
-
 function Public.generate(event)
     local surface = event.surface
     local left_top = event.area.left_top
     local left_top_x = left_top.x
     local left_top_y = left_top.y
 
-    mixed_ore(surface, left_top_x, left_top_y)
-    generate_river(surface, left_top_x, left_top_y)
+    mixed_ore(surface, nil, left_top_x, left_top_y)
+    generate_river(surface, nil, defines.direction.northeast, left_top)
+    generate_river(surface, nil, defines.direction.southeast, left_top)
+    generate_river(surface, nil, defines.direction.west, left_top)
+    -- generate_river(surface, nil, defines.direction.northeast, left_top)
     draw_biter_area(surface, left_top_x, left_top_y)
     generate_extra_worm_turrets(surface, left_top)
 end

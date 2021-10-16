@@ -12,12 +12,27 @@ function Public.contains(surface, seed, pos)
     surface = surface or game.surfaces[global.bb_surface_name]
     seed = seed or surface.map_gen_settings.seed
 
-    local x = math_floor(pos.x + 0.5)
-    local y = math_floor(pos.y + 0.5)
-    local r = math_sqrt(x ^ 2 + y ^ 2)
-
     local outer_r = TerrainParams.outer_circle.radius
     local outer_noise = TerrainParams.outer_circle.noise
+
+    if math_abs(pos.x) > outer_r or math_abs(pos.y) > outer_r then return false end
+
+    local x = math_floor(pos.x)
+    local y = math_floor(pos.y)
+    if x < 0 and y < 0 then
+        x = -x - 1
+        y = -y - 1
+    elseif x < 0 then
+        x = y
+        y = -math_floor(pos.x) - 1
+    elseif y < 0 then
+        x = -y - 1
+        y = math_floor(pos.x)
+    end
+    local r = math_sqrt(x ^ 2 + y ^ 2)
+
+    if r > outer_r then return false end
+    if r <= outer_r - outer_noise then return true end
 
     if outer_noise >= 1.0 then
         local noise = math_abs(Noises.spawn_circle_radius({x = x, y = y}, seed))
@@ -49,16 +64,17 @@ function Public.draw(surface, seed)
         for y = 0, outer_radius, 1 do
             -- LuaFormatter off
             local pos_rb = {x = x+0.5, y = y+0.5}
-            local pos_rt = {x = x+0.5, y =-y-0.5}
-            local pos_lb = {x =-x-0.5, y = y+0.5}
+            local pos_rt = {x = y+0.5, y =-x-0.5}
+            local pos_lb = {x =-y-0.5, y = x+0.5}
             local pos_lt = {x =-x-0.5, y =-y-0.5}
             -- LuaFormatter on
-            local r = math_sqrt(x ^ 2 + y ^ 2)
             local outer_r = outer_radius
+            local r = math_sqrt(x ^ 2 + y ^ 2)
+            if r > outer_r then goto skip_tile end
             local outer_r2 = outer_radius - outer_noise
             local outer_r3 = inner_radius + outer_noise
             if outer_noise >= 1.0 then
-                local noise = math_abs(Noises.spawn_circle_radius(pos_rb, seed))
+                local noise = math_abs(Noises.spawn_circle_radius({x = x, y = y}, seed))
                 outer_r = outer_r - noise * outer_noise
                 outer_r2 = outer_r - ((noise * outer_noise) * 2)
                 outer_r3 = inner_radius + ((noise * outer_noise) * 2)
@@ -86,6 +102,7 @@ function Public.draw(surface, seed)
                     end
                 end
             end
+            ::skip_tile::
         end
     end
     surface.set_tiles(tiles, true)

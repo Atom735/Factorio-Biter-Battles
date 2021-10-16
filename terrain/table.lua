@@ -12,6 +12,10 @@ local TerrainParams = {
     fish_chance = 0.05,
     silo_distance = 84.0,
     silo_safe_area = 14.0,
+    river = {
+        radius = 22.0,
+        noise = 11.0,
+    },
     spawn_ore = {
         -- Value "size" is a parameter used as coefficient for simplex noise
         -- function that is applied to shape of an ore patch. You can think of it
@@ -48,7 +52,10 @@ local TerrainParams = {
             big_patches = 1,
             small_patches = 0
         }
-    }
+    },
+    mixed_ores = {'copper-ore', 'iron-ore', 'stone', 'coal'},
+    -- mixed_ore_multiplier order is based on the ores variable
+    mixed_ore_multiplier = {1, 1, 1, 1},
 }
 -- LuaFormatter on
 

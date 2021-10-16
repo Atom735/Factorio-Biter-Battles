@@ -110,15 +110,12 @@ local function draw_noise_ore_patch(position, name, surface, radius, richness)
     if not surface then return end
     if not radius then return end
     if not richness then return end
-    local seed = game.surfaces[global.bb_surface_name].map_gen_settings.seed
-    local noise_seed_add = 25000
+    local seed = surface.map_gen_settings.seed
     local richness_part = richness / radius
     for y = radius * -3, radius * 3, 1 do
         for x = radius * -3, radius * 3, 1 do
             local pos = {x = x + position.x + 0.5, y = y + position.y + 0.5}
-            local noise_1 = simplex_noise(pos.x * 0.0125, pos.y * 0.0125, seed)
-            local noise_2 = simplex_noise(pos.x * 0.1, pos.y * 0.1, seed + 25000)
-            local noise = noise_1 + noise_2 * 0.12
+            local noise = Noises.spwan_ore(pos, seed) * 1.12
             local distance_to_center = math_sqrt(x ^ 2 + y ^ 2)
             local a = richness - richness_part * distance_to_center
             if distance_to_center < radius - math_abs(noise * radius * 0.85) and a > 1 then

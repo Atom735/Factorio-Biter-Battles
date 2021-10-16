@@ -34,9 +34,16 @@ local noise_params = {
         {seed =     0, size = 0.1500, weight = 0.025, },
     },
     spawn_circle_radius = {
-        {seed =     0, size = 0.3000, weight = 1.000, },
-        {seed = 25000, size = 0.6000, weight = 0.300, },
-        {seed = 25000, size = 0.9000, weight = 0.025, },
+        {seed =     0, size = 0.1000, weight = 1.000, },
+        {seed = 25000, size = 0.2000, weight = 0.300, },
+        {seed = 25000, size = 0.3000, weight = 0.025, },
+    },
+    random = {
+        {seed =     0, size = 1.0000, weight = 1.000, },
+    },
+    silo_safe_area = {
+        {seed =     0, size = 0.5000, weight = 1.000, },
+        {seed = 25000, size = 0.1000, weight = 0.500, },
     },
 }
 -- LuaFormatter on
@@ -73,6 +80,12 @@ function Noises.wall_entity(pos, seed) return get_noise(noise_params.wall_entity
 
 
 function Noises.spawn_circle_radius(pos, seed) return get_noise(noise_params.spawn_circle_radius, pos, seed) end
+
+
+function Noises.random(pos, seed) return get_noise(noise_params.random, pos, seed) end
+
+
+function Noises.silo_safe_area(pos, seed) return get_noise(noise_params.silo_safe_area, pos, seed) end
 
 
 return Noises

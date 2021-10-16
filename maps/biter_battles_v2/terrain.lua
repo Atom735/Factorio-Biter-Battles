@@ -692,4 +692,15 @@ function Public.deny_construction_bots(event)
 end
 
 
+function Public.draw_structures()
+    local surface = game.surfaces[global.bb_surface_name]
+    Public.draw_spawn_area(surface)
+    Public.clear_ore_in_main(surface)
+    Public.generate_spawn_ore(surface)
+    Public.generate_additional_rocks(surface)
+    Public.generate_silo(surface)
+    Public.draw_spawn_circle(surface)
+    -- Public.generate_spawn_goodies(surface)
+end
+
 return Public

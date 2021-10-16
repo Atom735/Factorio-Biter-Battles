@@ -400,76 +400,6 @@ function Public.generate(event)
 end
 
 
--- LuaFormatter off
-local spawn_circle_params = {
-    outer = {
-        radius = 39.0,
-        noise = 10.0,
-    },
-    inner = {
-        radius = 9.5,
-        sand = 7.0,
-    },
-    path_width = 5.0,
-    fish_factor = 0.64,
-}
--- LuaFormatter on
-
-function Public.draw_spawn_circle(surface, seed)
-    local outer_radius = spawn_circle_params.outer.radius
-    local outer_noise = spawn_circle_params.outer.noise
-    local inner_radius = spawn_circle_params.inner.radius
-    local inner_sand = spawn_circle_params.inner.sand
-    local fish_factor = spawn_circle_params.fish_factor
-    local tiles = {}
-    local entities = {}
-    seed = seed or game.surfaces[global.bb_surface_name].map_gen_settings.seed
-    for x = 0, outer_radius, 1 do
-        for y = 0, outer_radius, 1 do
-            local pos_rb = {x = x, y = y}
-            local pos_rt = {x = x, y = -y - 1}
-            local pos_lb = {x = -x - 1, y = y}
-            local pos_lt = {x = -x - 1, y = -y - 1}
-            local r = math_sqrt(x ^ 2 + y ^ 2)
-            local outer_r = outer_radius
-            local outer_r2 = outer_radius * 0.7
-            if outer_noise >= 1.0 then
-                local noise = math_abs(Noises.spawn_circle_radius(pos_rb, seed))
-                outer_r = outer_r - noise * outer_noise
-                outer_r2 = outer_r - (noise + 0.5) * 5
-            end
-            if r <= outer_r then
-                local tile_name = 'deepwater'
-                if r > outer_r2 then tile_name = 'water' end
-                if r < inner_radius then
-                    if r < inner_sand then
-                        tile_name = 'sand-1'
-                    else
-                        tile_name = 'refined-concrete'
-                    end
-                end
-                table_insert(tiles, {name = tile_name, position = pos_rb})
-                table_insert(tiles, {name = tile_name, position = pos_rt})
-                table_insert(tiles, {name = tile_name, position = pos_lb})
-                table_insert(tiles, {name = tile_name, position = pos_lt})
-                if tile_name == 'deepwater' or tile_name == 'water' then
-                    local fish_noise = math_abs(Noises.random(pos_rb, seed))
-                    if fish_noise > fish_factor then
-                        table_insert(entities, pos_rb)
-                        table_insert(entities, pos_rt)
-                        table_insert(entities, pos_lb)
-                        table_insert(entities, pos_lt)
-            end
-        end
-    end
-    end
-    end
-    surface.set_tiles(tiles, true)
-
-    for i = 1, #entities, 1 do surface.create_entity({name = 'fish', position = entities[i]}) end
-end
-
-
 function Public.draw_spawn_area(surface)
     local chunk_r = 4
     local r = chunk_r * 32
@@ -580,40 +510,6 @@ function Public.generate_additional_rocks(surface)
 end
 
 
-function Public.generate_silo(surface)
-    local pos = {x = -32 + math_random(0, 64), y = -72}
-    local mirror_position = {x = pos.x * -1, y = pos.y * -1}
-
-    for _, t in pairs(surface.find_tiles_filtered({
-        area = {{pos.x - 6, pos.y - 6}, {pos.x + 6, pos.y + 6}}, name = {'water', 'deepwater'},
-    })) do surface.set_tiles({{name = get_replacement_tile(surface, t.position), position = t.position}}) end
-    for _, t in pairs(surface.find_tiles_filtered({
-        area = {{mirror_position.x - 6, mirror_position.y - 6}, {mirror_position.x + 6, mirror_position.y + 6}},
-        name = {'water', 'deepwater'},
-    })) do surface.set_tiles({{name = get_replacement_tile(surface, t.position), position = t.position}}) end
-
-    local silo = surface.create_entity({name = 'rocket-silo', position = pos, force = 'north'})
-    silo.minable = false
-    global.rocket_silo[silo.force.name] = silo
-    Functions.add_target_entity(global.rocket_silo[silo.force.name])
-
-    for _ = 1, 32, 1 do create_mirrored_tile_chain(surface, {name = 'stone-path', position = silo.position}, 32, 10) end
-
-    local p = silo.position
-    for _, entity in pairs(surface.find_entities({{p.x - 4, p.y - 4}, {p.x + 4, p.y + 4}})) do
-        if entity.type == 'simple-entity' or entity.type == 'tree' or entity.type == 'resource' then
-            entity.destroy()
-        end
-    end
-    local turret1 = surface.create_entity({name = 'gun-turret', position = {x = pos.x, y = pos.y - 5}, force = 'north'})
-    turret1.insert({name = 'firearm-magazine', count = 10})
-    local turret2 = surface.create_entity({
-        name = 'gun-turret', position = {x = pos.x + 2, y = pos.y - 5}, force = 'north',
-    })
-    turret2.insert({name = 'firearm-magazine', count = 10})
-end
-
-
 --[[
 function Public.generate_spawn_goodies(surface)
 	local tiles = surface.find_tiles_filtered({name = "stone-path"})
@@ -718,14 +614,16 @@ function Public.deny_construction_bots(event)
 end
 
 
+local TerrainNg = require 'terrain.main'
+
 function Public.draw_structures()
+
     local surface = game.surfaces[global.bb_surface_name]
-    Public.draw_spawn_area(surface)
-    Public.clear_ore_in_main(surface)
-    Public.generate_spawn_ore(surface)
+    -- Public.draw_spawn_area(surface)
+    -- Public.clear_ore_in_main(surface)
+    -- Public.generate_spawn_ore(surface)
     Public.generate_additional_rocks(surface)
-    Public.generate_silo(surface)
-    Public.draw_spawn_circle(surface)
+    TerrainNg.draw_structures()
     -- Public.generate_spawn_goodies(surface)
 end
 

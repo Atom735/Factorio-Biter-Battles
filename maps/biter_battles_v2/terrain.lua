@@ -411,6 +411,7 @@ local spawn_circle_params = {
         sand = 7.0,
     },
     path_width = 5.0,
+    fish_factor = 0.64,
 }
 -- LuaFormatter on
 
@@ -419,14 +420,16 @@ function Public.draw_spawn_circle(surface, seed)
     local outer_noise = spawn_circle_params.outer.noise
     local inner_radius = spawn_circle_params.inner.radius
     local inner_sand = spawn_circle_params.inner.sand
+    local fish_factor = spawn_circle_params.fish_factor
     local tiles = {}
+    local entities = {}
     seed = seed or game.surfaces[global.bb_surface_name].map_gen_settings.seed
     for x = 0, outer_radius, 1 do
         for y = 0, outer_radius, 1 do
             local pos_rb = {x = x, y = y}
             local pos_rt = {x = x, y = -y - 1}
-            local pos_lb = {x = x, y = y}
-            local pos_lt = {x = x, y = -y - 1}
+            local pos_lb = {x = -x - 1, y = y}
+            local pos_lt = {x = -x - 1, y = -y - 1}
             local r = math_sqrt(x ^ 2 + y ^ 2)
             local outer_r = outer_radius
             local outer_r2 = outer_radius * 0.7
@@ -449,23 +452,21 @@ function Public.draw_spawn_circle(surface, seed)
                 table_insert(tiles, {name = tile_name, position = pos_rt})
                 table_insert(tiles, {name = tile_name, position = pos_lb})
                 table_insert(tiles, {name = tile_name, position = pos_lt})
+                if tile_name == 'deepwater' or tile_name == 'water' then
+                    local fish_noise = math_abs(Noises.random(pos_rb, seed))
+                    if fish_noise > fish_factor then
+                        table_insert(entities, pos_rb)
+                        table_insert(entities, pos_rt)
+                        table_insert(entities, pos_lb)
+                        table_insert(entities, pos_lt)
             end
         end
     end
-
-    for i = 1, #tiles, 1 do
-        table_insert(tiles, {name = tiles[i].name, position = {tiles[i].position.x * -1 - 1, tiles[i].position.y}})
     end
-
+    end
     surface.set_tiles(tiles, true)
 
-    for i = 1, #tiles, 1 do
-        if tiles[i].name == 'deepwater' or tiles[i].name == 'water' then
-            if math_random(1, 48) == 1 then
-                surface.create_entity({name = 'fish', position = tiles[i].position})
-            end
-        end
-    end
+    for i = 1, #entities, 1 do surface.create_entity({name = 'fish', position = entities[i]}) end
 end
 
 

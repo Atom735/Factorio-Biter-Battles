@@ -10,8 +10,8 @@ local TerrainParams = {
     },
     path_width = 5.0,
     fish_factor = 0.85,
-    silo_distance = 84,
-    silo_safe_area = 14,
+    silo_distance = 84.0,
+    silo_safe_area = 14.0,
 }
 -- LuaFormatter on
 

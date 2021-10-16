@@ -86,7 +86,7 @@ function Noises.wall_entity(pos, seed) return get_noise(noise_params.wall_entity
 function Noises.spawn_circle_radius(pos, seed) return get_noise(noise_params.spawn_circle_radius, pos, seed) end
 
 
-function Noises.spwan_ore(pos, seed) return get_noise(noise_params.spwan_ore, pos, seed) end
+function Noises.spawn_ore(pos, seed) return get_noise(noise_params.spawn_ore, pos, seed) end
 
 
 function Noises.random(pos, seed) return get_noise(noise_params.random, pos, seed) end

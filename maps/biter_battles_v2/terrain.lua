@@ -13,6 +13,7 @@ local math_abs = math.abs
 local math_sqrt = math.sqrt
 
 local Noises = require 'utils.noises'
+local TerrainDebug = require 'terrain.debug'
 
 local simplex_noise = require 'utils.simplex_noise'
 local spawn_circle_radius = 39
@@ -101,33 +102,6 @@ local function get_replacement_tile(surface, position)
         end
     end
     return 'grass-1'
-end
-
-
-local function draw_noise_ore_patch(position, name, surface, radius, richness)
-    if not position then return end
-    if not name then return end
-    if not surface then return end
-    if not radius then return end
-    if not richness then return end
-    local seed = surface.map_gen_settings.seed
-    local richness_part = richness / radius
-    for y = radius * -3, radius * 3, 1 do
-        for x = radius * -3, radius * 3, 1 do
-            local pos = {x = x + position.x + 0.5, y = y + position.y + 0.5}
-            local noise = Noises.spwan_ore(pos, seed) * 1.12
-            local distance_to_center = math_sqrt(x ^ 2 + y ^ 2)
-            local a = richness - richness_part * distance_to_center
-            if distance_to_center < radius - math_abs(noise * radius * 0.85) and a > 1 then
-                if surface.can_place_entity({name = name, position = pos, amount = a}) then
-                    surface.create_entity {name = name, position = pos, amount = a}
-                    for _, e in pairs(surface.find_entities_filtered({
-                        position = pos, name = {'wooden-chest', 'stone-wall', 'gun-turret'},
-                    })) do e.destroy() end
-                end
-            end
-        end
-    end
 end
 
 
@@ -414,22 +388,6 @@ function Public.draw_spawn_area(surface)
 end
 
 
-local function draw_grid_ore_patch(count, grid, name, surface, size, density)
-    -- Takes a random left_top coordinate from grid, removes it and draws
-    -- ore patch on top of it. Grid is held by reference, so this function
-    -- is reentrant.
-    for i = 1, count, 1 do
-        local idx = math.random(1, #grid)
-        local pos = grid[idx]
-        table.remove(grid, idx)
-
-        -- The draw_noise_ore_patch expects position with x and y keys.
-        pos = {x = pos[1], y = pos[2]}
-        draw_noise_ore_patch(pos, name, surface, size, density)
-    end
-end
-
-
 local function _clear_resources(surface, area)
     local resources = surface.find_entities_filtered {area = area, type = 'resource'}
 
@@ -468,31 +426,6 @@ function Public.clear_ore_in_main(surface)
 end
 
 
-function Public.generate_spawn_ore(surface)
-    -- This array holds indicies of chunks onto which we desire to
-    -- generate ore patches. It is visually representing north spawn
-    -- area. One element was removed on purpose - we don't want to
-    -- draw ore in the lake which overlaps with chunk [0,-1]. All ores
-    -- will be mirrored to south.
-    local grid = {
-        {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {-2, -1},
-        {-1, -1}, {1, -1}, {2, -1},
-    }
-
-    -- Calculate left_top position of a chunk. It will be used as origin
-    -- for ore drawing. Reassigns new coordinates to the grid.
-    for i, _ in ipairs(grid) do
-        grid[i][1] = grid[i][1] * 32 + math.random(-12, 12)
-        grid[i][2] = grid[i][2] * 32 + math.random(-24, -1)
-    end
-
-    for name, props in pairs(spawn_ore) do
-        draw_grid_ore_patch(props.big_patches, grid, name, surface, props.size, props.density)
-        draw_grid_ore_patch(props.small_patches, grid, name, surface, props.size / 2, props.density)
-    end
-end
-
-
 function Public.generate_additional_rocks(surface)
     local r = 130
     if surface.count_entities_filtered({type = 'simple-entity', area = {{r * -1, r * -1}, {r, 0}}}) >= 12 then return end
@@ -502,7 +435,10 @@ function Public.generate_additional_rocks(surface)
         local p = surface.find_non_colliding_position(name, {
             position.x + (-10 + math_random(0, 20)), position.y + (-10 + math_random(0, 20)),
         }, 16, 1)
-        if p and p.y < -16 then surface.create_entity({name = name, position = p}) end
+        if p and p.y < -16 then
+            TerrainDebug.tile_debug_render(surface, p, 0.8)
+            surface.create_entity({name = name, position = p})
+        end
     end
 end
 
@@ -618,7 +554,6 @@ function Public.draw_structures()
     local surface = game.surfaces[global.bb_surface_name]
     -- Public.draw_spawn_area(surface)
     -- Public.clear_ore_in_main(surface)
-    -- Public.generate_spawn_ore(surface)
     Public.generate_additional_rocks(surface)
     TerrainNg.draw_structures()
     -- Public.generate_spawn_goodies(surface)

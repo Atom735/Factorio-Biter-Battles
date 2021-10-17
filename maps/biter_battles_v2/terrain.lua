@@ -5,6 +5,9 @@ local bb_config = require 'maps.biter_battles_v2.config'
 local Functions = require 'maps.biter_battles_v2.functions'
 local tables = require 'maps.biter_battles_v2.tables'
 
+local TerrainNg = require 'terrain.main'
+
+
 local spawn_ore = tables.spawn_ore
 local table_insert = table.insert
 local math_floor = math.floor
@@ -307,15 +310,11 @@ end
 
 
 function Public.generate(event)
+    TerrainNg.generate(event)
     local surface = event.surface
     local left_top = event.area.left_top
     local left_top_x = left_top.x
     local left_top_y = left_top.y
-
-    mixed_ore(surface, nil, left_top_x, left_top_y)
-    generate_river(surface, nil, defines.direction.northeast, left_top)
-    generate_river(surface, nil, defines.direction.southeast, left_top)
-    generate_river(surface, nil, defines.direction.west, left_top)
     -- generate_river(surface, nil, defines.direction.northeast, left_top)
     draw_biter_area(surface, left_top_x, left_top_y)
     generate_extra_worm_turrets(surface, left_top)
@@ -497,8 +496,6 @@ function Public.deny_construction_bots(event)
     event.created_entity.destroy()
 end
 
-
-local TerrainNg = require 'terrain.main'
 
 function Public.draw_structures()
 

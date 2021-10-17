@@ -20,9 +20,12 @@ local noise_params = {
         {seed = 10000, size = 0.1000, weight = 0.025, },
     },
     river = {
-        {seed =     0, size = 0.0042, weight = 1.000, },
-        {seed = 25000, size = 0.0310, weight = 0.080, },
-        {seed = 25000, size = 0.1000, weight = 0.025, },
+        -- {seed =     0, size = 0.0042, weight = 1.000, },
+        -- {seed = 25000, size = 0.0310, weight = 0.080, },
+        -- {seed = 25000, size = 0.1000, weight = 0.025, },
+        {seed =     0, size = 0.0142, weight = 1.000, },
+        {seed = 12000, size = 0.0310, weight = 0.380, },
+        {seed = 25000, size = 0.1000, weight = 0.125, },
     },
     wall_distance = {
         {seed =     0, size = 0.0110, weight = 1.000, },

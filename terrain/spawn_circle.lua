@@ -60,8 +60,8 @@ function Public.draw(surface, seed)
     local tiles = {}
     local entities = {}
 
-    for x = 0, outer_radius, 1 do
-        for y = 0, outer_radius, 1 do
+    for y = 0, outer_radius, 1 do
+        for x = 0, outer_radius, 1 do
             -- LuaFormatter off
             local pos_rb = {x = x+0.5, y = y+0.5}
             local pos_rt = {x = y+0.5, y =-x-0.5}

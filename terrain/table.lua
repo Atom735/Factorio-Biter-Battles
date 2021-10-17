@@ -15,6 +15,8 @@ local TerrainParams = {
     river = {
         radius = 22.0,
         noise = 11.0,
+        curve_factor = 1.2,
+        curve_noise = 5.1,
     },
     spawn_ore = {
         -- Value "size" is a parameter used as coefficient for simplex noise

@@ -18,6 +18,18 @@ local TerrainParams = {
         noise = 11.0,
         curve_factor = 1.2,
         curve_noise = 5.1,
+        directions = {
+            defines.direction.east,
+            defines.direction.west,
+        },
+    },
+    team_directions = {
+        defines.direction.south,
+        defines.direction.north,
+    },
+    walls = {
+        radius = 95.0,
+        noise = 14.0,
     },
     rocks_min_count = 24,
     spawn_ore = {

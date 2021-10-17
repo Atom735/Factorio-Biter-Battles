@@ -7,7 +7,6 @@ local tables = require 'maps.biter_battles_v2.tables'
 
 local TerrainNg = require 'terrain.main'
 
-
 local spawn_ore = tables.spawn_ore
 local table_insert = table.insert
 local math_floor = math.floor
@@ -45,51 +44,6 @@ local loot_blacklist = {
     ['chemical-science-pack'] = true, ['production-science-pack'] = true, ['utility-science-pack'] = true,
     ['space-science-pack'] = true, ['loader'] = true, ['fast-loader'] = true, ['express-loader'] = true,
 }
-
-local function shuffle(tbl)
-    local size = #tbl
-    for i = size, 1, -1 do
-        local rand = math_random(size)
-        tbl[i], tbl[rand] = tbl[rand], tbl[i]
-    end
-    return tbl
-end
-
-
-local function create_mirrored_tile_chain(surface, tile, count, straightness)
-    if not surface then return end
-    if not tile then return end
-    if not count then return end
-
-    local position = {x = tile.position.x, y = tile.position.y}
-
-    local modifiers = {
-        {x = 0, y = -1}, {x = -1, y = 0}, {x = 1, y = 0}, {x = 0, y = 1}, {x = -1, y = 1}, {x = 1, y = -1},
-        {x = 1, y = 1}, {x = -1, y = -1},
-    }
-    modifiers = shuffle(modifiers)
-
-    for _ = 1, count, 1 do
-        local tile_placed = false
-
-        if math_random(0, 100) > straightness then modifiers = shuffle(modifiers) end
-        for b = 1, 4, 1 do
-            local pos = {x = position.x + modifiers[b].x, y = position.y + modifiers[b].y}
-            if surface.get_tile(pos).name ~= tile.name then
-                surface.set_tiles({{name = 'landfill', position = pos}}, true)
-                surface.set_tiles({{name = tile.name, position = pos}}, true)
-                -- surface.set_tiles({{name = "landfill", position = {pos.x * -1, (pos.y * -1) - 1}}}, true)
-                -- surface.set_tiles({{name = tile.name, position = {pos.x * -1, (pos.y * -1) - 1}}}, true)
-                position = {x = pos.x, y = pos.y}
-                tile_placed = true
-                break
-            end
-        end
-
-        if not tile_placed then position = {x = position.x + modifiers[1].x, y = position.y + modifiers[1].y} end
-    end
-end
-
 
 local function get_replacement_tile(surface, position)
     for i = 1, 128, 1 do
@@ -203,8 +157,6 @@ local function generate_starting_area(pos, distance_to_center, surface)
 end
 
 
-local generate_river = require'terrain.river'.generate
-
 local scrap_vectors = {}
 for x = -8, 8, 1 do
     for y = -8, 8, 1 do if math_sqrt(x ^ 2 + y ^ 2) <= 8 then scrap_vectors[#scrap_vectors + 1] = {x, y} end end
@@ -311,11 +263,11 @@ end
 
 function Public.generate(event)
     TerrainNg.generate(event)
+
     local surface = event.surface
     local left_top = event.area.left_top
     local left_top_x = left_top.x
     local left_top_y = left_top.y
-    -- generate_river(surface, nil, defines.direction.northeast, left_top)
     draw_biter_area(surface, left_top_x, left_top_y)
     generate_extra_worm_turrets(surface, left_top)
 end
@@ -335,61 +287,6 @@ function Public.draw_spawn_area(surface)
 
     surface.destroy_decoratives({})
     surface.regenerate_decorative()
-end
-
-
-local function _clear_resources(surface, area)
-    local resources = surface.find_entities_filtered {area = area, type = 'resource'}
-
-    local i = 0
-    for _, res in pairs(resources) do
-        if not res.valid then goto clear_resources_cont end
-        res.destroy()
-        i = i + 1
-
-        ::clear_resources_cont::
-    end
-
-    return i
-end
-
-
-function Public.clear_ore_in_main(surface)
-    local area = {left_top = {-150, -150}, right_bottom = {150, 0}}
-    local limit = 20
-    local cnt = 0
-    repeat
-        -- Keep clearing resources until there is none.
-        -- Each cycle increases search area.
-        cnt = _clear_resources(surface, area)
-        limit = limit - 1
-        area.left_top[1] = area.left_top[1] - 5
-        area.left_top[2] = area.left_top[2] - 5
-        area.right_bottom[1] = area.right_bottom[1] + 5
-    until cnt == 0 or limit == 0
-
-    if limit == 0 then
-        log('Limit reached, some ores might be truncated in spawn area')
-        log('If this is a custom build, remove a call to clear_ore_in_main')
-        log('If this in a standard value, limit could be tweaked')
-    end
-end
-
-
-function Public.generate_additional_rocks(surface)
-    local r = 130
-    if surface.count_entities_filtered({type = 'simple-entity', area = {{r * -1, r * -1}, {r, 0}}}) >= 12 then return end
-    local position = {x = -96 + math_random(0, 192), y = -40 - math_random(0, 96)}
-    for _ = 1, math_random(6, 10) do
-        local name = rocks[math_random(1, 5)]
-        local p = surface.find_non_colliding_position(name, {
-            position.x + (-10 + math_random(0, 20)), position.y + (-10 + math_random(0, 20)),
-        }, 16, 1)
-        if p and p.y < -16 then
-            TerrainDebug.tile_debug_render(surface, p, 0.8)
-            surface.create_entity({name = name, position = p})
-        end
-    end
 end
 
 
@@ -500,9 +397,7 @@ end
 function Public.draw_structures()
 
     local surface = game.surfaces[global.bb_surface_name]
-    Public.draw_spawn_area(surface)
-    Public.clear_ore_in_main(surface)
-    Public.generate_additional_rocks(surface)
+    -- Public.draw_spawn_area(surface)
     TerrainNg.draw_structures()
     -- Public.generate_spawn_goodies(surface)
 end

@@ -38,12 +38,11 @@ end
 
 
 function TerrainDebug.entity(surface, pos, value, color, radius)
-    if not enabled then return end
     -- LuaFormatter off
     rendering.draw_circle {
         color = color or get_color(value),
         surface = surface,
-        radius = radius or 0.9,
+        radius = radius or 0.45,
         target  = {pos.x, pos.y},
         filled = true,
     }
@@ -52,7 +51,6 @@ end
 
 
 function TerrainDebug.tile(surface, pos, value, color)
-    if not enabled then return end
 
     pos = {x = math_floor(pos.x), y = math_floor(pos.y)}
     -- LuaFormatter off
@@ -68,7 +66,6 @@ end
 
 
 function TerrainDebug.tile2(surface, pos, value, color)
-    if not enabled then return end
     pos = {x = math_floor(pos.x), y = math_floor(pos.y)}
     -- LuaFormatter off
     rendering.draw_line {
@@ -82,19 +79,34 @@ function TerrainDebug.tile2(surface, pos, value, color)
 end
 
 
-function TerrainDebug.tile_spawner(surface, pos) TerrainDebug.tile2(surface, pos, nil, {102, 8, 255, 200}) end
+function TerrainDebug.tile_spawner(surface, pos)
+    if not enabled then return end
+    TerrainDebug.tile2(surface, pos, nil, {102, 8, 255, 200})
+end
 
 
-function TerrainDebug.tile_river(surface, pos) TerrainDebug.tile(surface, pos, nil, {8, 160, 255, 200}) end
+function TerrainDebug.tile_river(surface, pos)
+    if not enabled then return end
+    TerrainDebug.tile(surface, pos, nil, {8, 160, 255, 200})
+end
 
 
-function TerrainDebug.tile_spawn_ores(surface, pos) TerrainDebug.tile2(surface, pos, nil, {8, 255, 148, 200}) end
+function TerrainDebug.tile_spawn_ores(surface, pos)
+    if not enabled then return end
+    TerrainDebug.tile2(surface, pos, nil, {8, 255, 148, 200})
+end
 
 
-function TerrainDebug.tile_spawn_silo(surface, pos) TerrainDebug.tile(surface, pos, nil, {102, 8, 255, 200}) end
+function TerrainDebug.tile_spawn_silo(surface, pos)
+    if not enabled then return end
+    TerrainDebug.tile(surface, pos, nil, {102, 8, 255, 200})
+end
 
 
-function TerrainDebug.entity_rock(surface, pos) TerrainDebug.entity(surface, pos, nil, {105, 77, 27, 200}) end
+function TerrainDebug.entity_rock(surface, pos)
+    if not enabled then return end
+    TerrainDebug.entity(surface, pos, nil, {105, 77, 27, 200})
+end
 
 
 return TerrainDebug

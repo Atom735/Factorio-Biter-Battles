@@ -32,9 +32,12 @@ local noise_params = {
         {seed = 25000, size = 0.0080, weight = 0.200, },
     },
     wall_entity = {
-        {seed =     0, size = 0.0050, weight = 1.000, },
-        {seed =     0, size = 0.0200, weight = 0.300, },
-        {seed =     0, size = 0.1500, weight = 0.025, },
+        -- {seed =     0, size = 0.0050, weight = 1.000, },
+        -- {seed =     0, size = 0.0200, weight = 0.300, },
+        -- {seed =     0, size = 0.1500, weight = 0.025, },
+        {seed =     0, size = 0.1000, weight = 1.000, },
+        {seed = 10000, size = 0.5000, weight = 0.330, },
+        {seed = 11000, size = 0.9000, weight = 0.105, },
     },
     spawn_circle_radius = {
         {seed =     0, size = 0.1000, weight = 1.000, },

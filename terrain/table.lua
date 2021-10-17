@@ -33,28 +33,28 @@ local TerrainParams = {
         -- patches of given type. The "density" is applied with the same rule
         -- regardless of the patch size.
         ["iron-ore"] = {
-            size = 23,
+            size = 25,
             density = 3500,
             big_patches = 2,
-            small_patches = 1
+            small_patches = 1,
         },
         ["copper-ore"] = {
-            size = 21,
+            size = 25,
             density = 3000,
             big_patches = 1,
-            small_patches = 2
+            small_patches = 2,
         },
         ["coal"] = {
-            size = 22,
+            size = 25,
             density = 2500,
             big_patches = 1,
-            small_patches = 1
+            small_patches = 1,
         },
         ["stone"] = {
-            size = 20,
+            size = 25,
             density = 2000,
             big_patches = 1,
-            small_patches = 0
+            small_patches = 1,
         }
     },
     mixed_ores = {'copper-ore', 'iron-ore', 'stone', 'coal'},

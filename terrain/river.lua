@@ -21,9 +21,13 @@ function Public.contains(surface, seed, direction, pos)
     local curve_noise = TerrainParams.river.curve_noise
 
     -- LuaFormatter off
+    local tile_pos = {
+        x = math_floor(pos.x) ,
+        y = math_floor(pos.y),
+    }
     pos = {
-        x = math_floor(pos.x) + 0.5,
-        y = math_floor(pos.y) + 0.5,
+        x = tile_pos.x + 0.5,
+        y = tile_pos.y + 0.5,
     }
     -- LuaFormatter on
 
@@ -49,10 +53,10 @@ function Public.contains(surface, seed, direction, pos)
     if py > outer_r then return false end
 
     -- Skip spawan_circle tiles
-    if is_spawn_circle(surface, seed, pos) then return false end
+    if is_spawn_circle(surface, seed, tile_pos) then return false end
 
     if outer_noise >= 1.0 then
-        local noise = math_abs(Noises.river(pos, seed))
+        local noise = math_abs(Noises.river(tile_pos, seed))
         if curve_noise > 0 then noise = noise * (px * curve_noise * 0.01) end
         outer_r = outer_r - noise * outer_noise
     end
@@ -78,10 +82,7 @@ function Public.generate(surface, seed, direction, left_top)
 
     local outer_r = outer_radius
     -- LuaFormatter off
-    local pos = {
-        x = left_top.x + 0.5,
-        y = left_top.y + 0.5,
-    }
+    local pos = {x = left_top.x + 0.5, y = left_top.y + 0.5}
     -- LuaFormatter on
 
     -- Skip the chunk if it's far from the river
@@ -100,14 +101,8 @@ function Public.generate(surface, seed, direction, left_top)
     for y = 0, 31, 1 do
         for x = 0, 31, 1 do
             -- LuaFormatter off
-            local tile_pos = {
-                x = left_top.x + x,
-                y = left_top.y + y,
-            }
-            pos = {
-                x = tile_pos.x + 0.5,
-                y = tile_pos.y + 0.5,
-            }
+            local tile_pos = {x = left_top.x + x, y = left_top.y + y}
+            pos = {x = tile_pos.x + 0.5, y = tile_pos.y + 0.5}
             -- LuaFormatter on
 
             px = pos.x * dv.x + pos.y * dv.y

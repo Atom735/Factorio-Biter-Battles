@@ -3,6 +3,7 @@ local Noises = require 'utils.noises'
 local TerrainDebug = require 'terrain.debug'
 local DirectionVectors = require 'utils.direction_vectors'
 local Functions = require 'maps.biter_battles_v2.functions'
+local get_replacement_tile_name = require'terrain.utils'.get_replacement_tile_name
 
 local table_insert = table.insert
 local math_floor = math.floor
@@ -55,25 +56,26 @@ local function generate_silo(surface, seed, direction, force)
             local noise = 0.0
             noise = math_abs(Noises.silo_safe_area(pos_rb, seed))
             if noise > r then
-                table_insert(tiles, {name = 'sand-1', position = pos_rb})
+                table_insert(tiles, {name = get_replacement_tile_name(surface,seed,pos_rb), position = pos_rb})
                 table_insert(tiles, {name = 'stone-path', position = pos_rb})
                 TerrainDebug.tile_spawn_silo(surface, pos_rb)
             end
             noise = math_abs(Noises.silo_safe_area(pos_rt, seed))
             if noise > r then
-                table_insert(tiles, {name = 'sand-1', position = pos_rt})
+                table_insert(tiles, {name = get_replacement_tile_name(surface,seed,pos_rt), position = pos_rt})
                 table_insert(tiles, {name = 'stone-path', position = pos_rt})
                 TerrainDebug.tile_spawn_silo(surface, pos_rt)
             end
             noise = math_abs(Noises.silo_safe_area(pos_lb, seed))
             if noise > r then
-                table_insert(tiles, {name = 'sand-1', position = pos_lb})
+                table_insert(tiles, {name = get_replacement_tile_name(surface,seed,pos_lb), position = pos_lb})
                 table_insert(tiles, {name = 'stone-path', position = pos_lb})
                 TerrainDebug.tile_spawn_silo(surface, pos_lb)
             end
             noise = math_abs(Noises.silo_safe_area(pos_lt, seed))
             if noise > r then
-                table_insert(tiles, {name = 'sand-1', position = pos_lt})
+
+                table_insert(tiles, {name = get_replacement_tile_name(surface,seed,pos_lt), position = pos_lt})
                 table_insert(tiles, {name = 'stone-path', position = pos_lt})
                 TerrainDebug.tile_spawn_silo(surface, pos_lt)
             end

@@ -1,5 +1,6 @@
 local TerrainDebug = require 'terrain.debug'
-local TerrainParams = require 'terrain.table'
+local TerrainParams = require 'terrain.params'
+local TeamsTables = require 'teams.tables'
 local draw_spawn_circle = require'terrain.spawn_circle'.draw
 local generate_silo = require 'terrain.silo'
 local generate_spawn_ore = require'terrain.spawn_ores'.generate_spawn_ore
@@ -17,11 +18,12 @@ Terrain.is_river = require'terrain.river'.contains
 function Terrain.draw_structures()
     local surface = game.surfaces[global.bb_surface_name]
     local team_directions = TerrainParams.team_directions
-    for _, direction in pairs(team_directions) do draw_spawn_area(surface, nil, direction) end
+    local team_names = TeamsTables.names
+    for _, direction in pairs(team_directions) do draw_spawn_area(surface, nil, direction, team_names[direction]) end
     for _, direction in pairs(team_directions) do clear_ore_in_main(surface, direction) end
     for _, direction in pairs(team_directions) do generate_additional_rocks(surface, nil, direction) end
     for _, direction in pairs(team_directions) do generate_spawn_ore(surface, nil, direction) end
-    for _, direction in pairs(team_directions) do generate_silo(surface, nil, direction) end
+    for _, direction in pairs(team_directions) do generate_silo(surface, nil, direction, team_names[direction]) end
     draw_spawn_circle(surface)
 end
 

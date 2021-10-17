@@ -1,5 +1,5 @@
 local Noises = require 'utils.noises'
-local TerrainParams = require 'terrain.table'
+local TerrainParams = require 'terrain.params'
 
 local math_floor = math.floor
 local math_abs = math.abs

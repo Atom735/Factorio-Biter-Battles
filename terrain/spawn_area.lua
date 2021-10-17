@@ -1,4 +1,4 @@
-local TerrainParams = require 'terrain.table'
+local TerrainParams = require 'terrain.params'
 local Noises = require 'utils.noises'
 local TerrainDebug = require 'terrain.debug'
 local DirectionVectors = require 'utils.direction_vectors'

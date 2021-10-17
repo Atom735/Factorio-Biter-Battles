@@ -1,4 +1,4 @@
-local enabled = require'terrain.table'.debug or false
+local enabled = require'terrain.params'.debug or false
 
 local TerrainDebug = {}
 

@@ -1,6 +1,6 @@
 local Noises = require 'utils.noises'
 local DirectionVectors = require 'utils.direction_vectors'
-local TerrainParams = require 'terrain.table'
+local TerrainParams = require 'terrain.params'
 local TerrainDebug = require 'terrain.debug'
 local is_spawn_circle = require'terrain.spawn_circle'.contains
 

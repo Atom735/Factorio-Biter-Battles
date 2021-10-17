@@ -24,7 +24,7 @@ local TerrainParams = {
         },
     },
     team_directions = {
-        defines.direction.south,
+        -- defines.direction.south,
         defines.direction.north,
     },
     walls = {

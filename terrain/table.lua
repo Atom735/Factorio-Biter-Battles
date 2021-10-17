@@ -18,6 +18,7 @@ local TerrainParams = {
         curve_factor = 1.2,
         curve_noise = 5.1,
     },
+    rocks_min_count = 24,
     spawn_ore = {
         -- Value "size" is a parameter used as coefficient for simplex noise
         -- function that is applied to shape of an ore patch. You can think of it

@@ -1,3 +1,4 @@
+local TerrainDebug = require 'terrain.debug'
 local draw_spawn_circle = require'terrain.spawn_circle'.draw
 local generate_silo = require 'terrain.silo'
 local generate_spawn_ore = require'terrain.spawn_ores'.generate_spawn_ore
@@ -9,6 +10,7 @@ local generate_river = require'terrain.river'.generate
 local Terrain = {}
 
 Terrain.is_spawn_circle = require'terrain.spawn_circle'.contains
+Terrain.is_river = require'terrain.river'.contains
 
 function Terrain.draw_structures()
     local surface = game.surfaces[global.bb_surface_name]
@@ -52,6 +54,19 @@ function Terrain.generate(event)
     local left_top = event.area.left_top
     local left_top_x = left_top.x
     local left_top_y = left_top.y
+
+    for y = 0, 31, 1 do
+        for x = 0, 31, 1 do
+            local pos = {x = left_top_x + x, y = left_top_y + y}
+            if Terrain.is_spawn_circle(surface, nil, pos) then TerrainDebug.tile_spawner(surface, pos) end
+            if Terrain.is_river(surface, nil, defines.direction.east, pos) then
+                TerrainDebug.tile_river(surface, pos)
+            end
+            if Terrain.is_river(surface, nil, defines.direction.west, pos) then
+                TerrainDebug.tile_river(surface, pos)
+            end
+        end
+    end
 
     mixed_ore(surface, nil, left_top_x, left_top_y)
     generate_river(surface, nil, defines.direction.east, left_top)

@@ -1,12 +1,8 @@
 local TerrainParams = require 'terrain.table'
-local Noises = require 'utils.noises'
+local TerrainDebug = require 'terrain.debug'
 local DirectionVectors = require 'utils.direction_vectors'
-local Functions = require 'maps.biter_battles_v2.functions'
 
-local table_insert = table.insert
 local math_floor = math.floor
-local math_abs = math.abs
-local math_sqrt = math.sqrt
 local math_max = math.max
 local math_min = math.min
 
@@ -57,10 +53,13 @@ local function generate_additional_rocks(surface, seed, direction)
     -- LuaFormatter on
     for _ = 1, rocks_min_count - count do
         local name = rocks[math_floor(random(1.1, 5.9))]
-        local p = surface.find_non_colliding_position(name, {
+        local pos = surface.find_non_colliding_position(name, {
             x = position.x + random(-sf, sf), y = position.y + random(-sf, sf),
         }, 16, 1)
-        if p then surface.create_entity({name = name, position = p}) end
+        if pos then
+            surface.create_entity({name = name, position = pos})
+            TerrainDebug.entity_rock(surface, pos)
+        end
     end
 end
 

@@ -1,6 +1,7 @@
 local Noises = require 'utils.noises'
 local DirectionVectors = require 'utils.direction_vectors'
 local TerrainParams = require 'terrain.table'
+local TerrainDebug = require 'terrain.debug'
 
 local table_insert = table.insert
 local table_remove = table.remove
@@ -27,6 +28,7 @@ local function draw_noise_ore_patch(surface, seed, name, position, radius, richn
             if distance_to_center < radius - math_abs(noise * radius * 0.85) and a > 1 then
                 if surface.can_place_entity({name = name, position = pos, amount = a}) then
                     surface.create_entity {name = name, position = pos, amount = a}
+                    TerrainDebug.tile_spawn_ores(surface, pos)
                     for _, e in pairs(surface.find_entities_filtered({
                         position = pos, name = {'wooden-chest', 'stone-wall', 'gun-turret'},
                     })) do e.destroy() end

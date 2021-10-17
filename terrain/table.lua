@@ -1,5 +1,6 @@
 -- LuaFormatter off
 local TerrainParams = {
+    debug = false,
     outer_circle = {
         radius = 39.0,
         noise = 10.0,

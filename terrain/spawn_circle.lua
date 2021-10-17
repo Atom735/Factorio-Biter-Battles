@@ -1,5 +1,6 @@
 local TerrainParams = require 'terrain.table'
 local Noises = require 'utils.noises'
+local TerrainDebug = require 'terrain.debug'
 
 local table_insert = table.insert
 local math_abs = math.abs
